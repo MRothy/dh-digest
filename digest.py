@@ -21,10 +21,14 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from pathlib import Path
 
+import warnings
+
 import feedparser
 import requests
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, MarkupResemblesLocatorWarning
 from dotenv import load_dotenv
+
+warnings.filterwarnings("ignore", category=MarkupResemblesLocatorWarning)
 
 # ── Logging ───────────────────────────────────────────────────────────────────
 logging.basicConfig(
@@ -67,7 +71,7 @@ RSS_FEEDS = [
 
 SCRAPE_TARGETS = [
     {"name": "Stanford Digital Humanities", "url": "https://digitalhumanities.stanford.edu/", "category": "Institutional Blogs"},
-    {"name": "HASTAC",                      "url": "https://hastac.org/news",                 "category": "Aggregators & News"},
+    {"name": "HASTAC",                      "url": "https://www.hastac.org/blog",             "category": "Aggregators & News"},
 ]
 
 # How many days back to include items from (7 = past week)
@@ -79,6 +83,17 @@ HEADERS = {
         "+https://github.com/your-username/dh-digest)"
     )
 }
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Utilities
+# ─────────────────────────────────────────────────────────────────────────────
+
+def _fmt_date(dt: datetime, fmt: str) -> str:
+    """strftime with cross-platform no-pad day: %-d on Linux, %#d on Windows."""
+    if os.name == "nt":
+        fmt = fmt.replace("%-d", "%#d")
+    return dt.strftime(fmt)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -162,7 +177,7 @@ def fetch_rss_items(feed_cfg: dict, seen: set, cutoff: datetime) -> list[dict]:
                 "link":    link,
                 "source":  name,
                 "category": cat,
-                "date":    pub_date.strftime("%b %-d, %Y") if pub_date else "",
+                "date":    _fmt_date(pub_date, "%b %-d, %Y") if pub_date else "",
                 "summary": summary,
             })
 
@@ -435,7 +450,7 @@ def main() -> None:
 
     log.info("Total new items: %d", len(all_items))
 
-    date_range = f"{cutoff.strftime('%b %-d')}–{now.strftime('%-d, %Y')}"
+    date_range = f"{_fmt_date(cutoff, '%b %-d')}–{_fmt_date(now, '%-d, %Y')}"
     subject    = f"DH Digest — {date_range}"
     html_body  = build_html(all_items, date_range)
     plain_body = build_plaintext(all_items, date_range)
