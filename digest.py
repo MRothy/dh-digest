@@ -57,14 +57,14 @@ RSS_FEEDS = [
     {"name": "Programming Historian",        "url": "https://programminghistorian.org/feed.xml",          "category": "Tutorials & Methods"},
     {"name": "Reviews in Digital Humanities","url": "https://reviewsindh.pubpub.org/rss.xml",             "category": "Tutorials & Methods"},
     # Professional Orgs
-    {"name": "ACH News",                     "url": "https://ach.org/news/feed/",                        "category": "Professional Orgs"},
+    # ACH News removed 2026-03-25 — https://ach.org/news/feed/ returns 404; no working feed URL found
     {"name": "The Stoa",                     "url": "https://blog.stoa.org/feed",                        "category": "Professional Orgs"},
     # Institutional Blogs
     {"name": "Sussex Humanities Lab",        "url": "https://sussexhumanitieslab.wordpress.com/feed/",   "category": "Institutional Blogs"},
-    {"name": "DH at Glasgow",               "url": "https://digitalhumanities.glasgow.ac.uk/feed/",      "category": "Institutional Blogs"},
-    {"name": "MITH",                         "url": "https://mith.umd.edu/news/feed/",                   "category": "Institutional Blogs"},
+    # DH at Glasgow removed 2026-03-25 — https://digitalhumanities.glasgow.ac.uk/feed/ connection refused (server unreachable)
+    # MITH removed 2026-03-25 — https://mith.umd.edu/news/feed/ redirects to dead 404 archive path (site under redevelopment)
     # Scholar Blogs
-    {"name": "Kathleen Fitzpatrick",         "url": "https://kfitz.info/feed/",                          "category": "Scholar Blogs"},
+    {"name": "Kathleen Fitzpatrick",         "url": "https://kfitz.info/feed/feed.xml",                  "category": "Scholar Blogs"},
     {"name": "Andrew Goldstone",             "url": "https://andrewgoldstone.com/index.xml",              "category": "Scholar Blogs"},
     {"name": "Matthew Lincoln",              "url": "https://matthewlincoln.net/feed.xml",                "category": "Scholar Blogs"},
 ]
