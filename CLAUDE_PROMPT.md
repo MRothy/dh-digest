@@ -112,5 +112,11 @@ Set in `.env` locally, and as GitHub Actions repository secrets for CI.
 
 ---
 
+### Recent changes (2026-04-11)
+- **English-language filtering added** — `langdetect==1.0.9` added to `requirements.txt`. New `_is_english(text)` helper in `digest.py` calls `detect()` on each item title before deduplication. Returns `True` (fail-open) on `LangDetectException`. Non-English items are skipped with an `INFO`-level log message. Applied in all three item-collection paths: `fetch_rss_items`, `_scrape_stanford`, `_scrape_hastac`.
+- **Programming Historian feed switched to English-only URL** — changed from `https://programminghistorian.org/feed.xml` to `https://programminghistorian.org/en/feed.xml` to filter at the source rather than relying on langdetect.
+
+---
+
 Now here is what I'd like to update: [DESCRIBE YOUR CHANGE HERE]
 
