@@ -36,4 +36,4 @@ jobs:
           git add seen_items.json
           # Only commit if the file actually changed
           git diff --cached --quiet || git commit -m "chore: update seen_items [skip ci]"
-          git push
+          git push --rebase

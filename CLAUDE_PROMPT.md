@@ -98,7 +98,7 @@ Set in `.env` locally, and as GitHub Actions repository secrets for CI.
 ### GitHub Actions workflow highlights
 - Trigger: `cron: '0 8 * * 1'` (Mondays 8am UTC) + `workflow_dispatch`
 - Uses `actions/setup-python@v5` with `cache: 'pip'`
-- After a successful run, commits updated `seen_items.json` back to `main`
+- After a successful run, commits updated `seen_items.json` back to `main` using `git push --rebase`
 
 ---
 
@@ -115,6 +115,7 @@ Set in `.env` locally, and as GitHub Actions repository secrets for CI.
 ### Recent changes (2026-04-11)
 - **English-language filtering added** — `langdetect==1.0.9` added to `requirements.txt`. New `_is_english(text)` helper in `digest.py` calls `detect()` on each item title before deduplication. Returns `True` (fail-open) on `LangDetectException`. Non-English items are skipped with an `INFO`-level log message. Applied in all three item-collection paths: `fetch_rss_items`, `_scrape_stanford`, `_scrape_hastac`.
 - **Programming Historian feed switched to English-only URL** — changed from `https://programminghistorian.org/feed.xml` to `https://programminghistorian.org/en/feed.xml` to filter at the source rather than relying on langdetect.
+- **GitHub Actions push changed to `git push --rebase`** — prevents push failures when the remote has moved ahead (e.g. another workflow run committed first).
 
 ---
 
