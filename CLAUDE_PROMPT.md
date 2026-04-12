@@ -26,7 +26,7 @@ I have a working Python project called **dh-digest** hosted at `https://github.c
 dh-digest/
 ├── digest.py                          # main script
 ├── seen_items.json                    # persists sent item hashes
-├── requirements.txt                   # feedparser, requests, beautifulsoup4, python-dotenv
+├── requirements.txt                   # feedparser, requests, beautifulsoup4, python-dotenv, langdetect
 ├── .env                               # local only — GMAIL_USER, GMAIL_APP_PASSWORD, RECIPIENT_EMAIL
 ├── .gitignore                         # excludes .env
 └── .github/
@@ -44,7 +44,7 @@ RSS_FEEDS = [
     {"name": "The Signal (Library of Congress)", "url": "https://blogs.loc.gov/thesignal/feed/",             "category": "Aggregators & News"},
     {"name": "DH+Lib",                           "url": "https://dhandlib.org/?feed=rss2",                   "category": "Aggregators & News"},
     # Tutorials & Methods
-    {"name": "Programming Historian",            "url": "https://programminghistorian.org/feed.xml",         "category": "Tutorials & Methods"},
+    {"name": "Programming Historian",            "url": "https://programminghistorian.org/en/feed.xml",         "category": "Tutorials & Methods"},
     {"name": "Reviews in Digital Humanities",    "url": "https://reviewsindh.pubpub.org/rss.xml",            "category": "Tutorials & Methods"},
     # Professional Orgs
     # ACH News removed 2026-03-25 — https://ach.org/news/feed/ returns 404; no working feed URL found
@@ -79,6 +79,7 @@ Scrapers are registered in a `SCRAPER_MAP` dict — adding a new scraper means w
 - **Email:** `multipart/alternative` with both HTML (inline CSS only) and plain text parts; sent via `smtplib.SMTP_SSL` on port 465
 - **Zero items:** exits cleanly with a log message, no email sent, `seen_items.json` not touched
 - **Feed errors:** logged and skipped per-feed — one bad feed never aborts the run
+- **Language filtering:** English-only filtering is active via `langdetect`. Each item's title is checked with `_is_english()` before deduplication; non-English items are skipped and logged at INFO level. Detection failures (LangDetectException) are treated as English (fail-open) to avoid discarding items when detection is uncertain.
 - **`seen_items.json`** is committed back to the repo by the GitHub Actions workflow after each successful send using `[skip ci]` to prevent a loop
 
 ---

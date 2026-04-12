@@ -27,6 +27,7 @@ import feedparser
 import requests
 from bs4 import BeautifulSoup, MarkupResemblesLocatorWarning
 from dotenv import load_dotenv
+from langdetect import detect, LangDetectException
 
 warnings.filterwarnings("ignore", category=MarkupResemblesLocatorWarning)
 
@@ -54,7 +55,7 @@ RSS_FEEDS = [
     {"name": "The Signal (Library of Congress)", "url": "https://blogs.loc.gov/thesignal/feed/",         "category": "Aggregators & News"},
     {"name": "DH+Lib",                       "url": "https://dhandlib.org/?feed=rss2",                   "category": "Aggregators & News"},
     # Tutorials & Methods
-    {"name": "Programming Historian",        "url": "https://programminghistorian.org/feed.xml",          "category": "Tutorials & Methods"},
+    {"name": "Programming Historian",        "url": "https://programminghistorian.org/en/feed.xml",          "category": "Tutorials & Methods"},
     {"name": "Reviews in Digital Humanities","url": "https://reviewsindh.pubpub.org/rss.xml",             "category": "Tutorials & Methods"},
     # Professional Orgs
     # ACH News removed 2026-03-25 — https://ach.org/news/feed/ returns 404; no working feed URL found
@@ -94,6 +95,14 @@ def _fmt_date(dt: datetime, fmt: str) -> str:
     if os.name == "nt":
         fmt = fmt.replace("%-d", "%#d")
     return dt.strftime(fmt)
+
+
+def _is_english(text: str) -> bool:
+    """Return True if text is detected as English, or if detection is uncertain."""
+    try:
+        return detect(text) == "en"
+    except LangDetectException:
+        return True
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -150,6 +159,11 @@ def fetch_rss_items(feed_cfg: dict, seen: set, cutoff: datetime) -> list[dict]:
         for entry in parsed.entries:
             link  = getattr(entry, "link",  "") or ""
             title = getattr(entry, "title", "") or "(no title)"
+
+            if not _is_english(title):
+                log.info("Skipping non-English item: %s", title)
+                continue
+
             uid   = item_id(link, title)
 
             if uid in seen:
@@ -209,6 +223,11 @@ def _scrape_stanford(target: dict, seen: set) -> list[dict]:
         if not link.startswith("http"):
             link = "https://digitalhumanities.stanford.edu" + link
         title = a_tag.get_text(strip=True) or article.find(["h2", "h3"]) and article.find(["h2", "h3"]).get_text(strip=True) or "(no title)"
+
+        if not _is_english(title):
+            log.info("Skipping non-English item: %s", title)
+            continue
+
         uid   = item_id(link, title)
         if uid in seen:
             continue
@@ -249,6 +268,11 @@ def _scrape_hastac(target: dict, seen: set) -> list[dict]:
         if not link.startswith("http"):
             link = "https://hastac.org" + link
         title = a_tag.get_text(strip=True) or "(no title)"
+
+        if not _is_english(title):
+            log.info("Skipping non-English item: %s", title)
+            continue
+
         uid   = item_id(link, title)
         if uid in seen:
             continue
